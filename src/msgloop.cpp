@@ -28,7 +28,7 @@ MessageLoop::MessageLoop(
 ) : appName{appName}, version{version}, server{port, numThreads} {
     auto& echo = this->server.endpoint["^/diplay/?$"];
     echo.onopen = [this](std::shared_ptr<WSServer::Connection> con) {
-        LOG(moba::INFO) << "opened connection <" << (size_t)con.get() << ">";
+        LOG(moba::INFO) << "opened connection <" << (size_t)con.get() << ">" << std::endl;
         for(auto item : this->msgBuffer) {
             auto send_stream = std::make_shared<WSServer::SendStream>();
             *send_stream << item.second;
@@ -37,11 +37,11 @@ MessageLoop::MessageLoop(
     };
 
     echo.onclose = [](std::shared_ptr<WSServer::Connection> connection, int status, const std::string& /*reason*/) {
-        LOG(moba::INFO) << "closed connection <" << (size_t)connection.get() << "> with status code <" << status << ">";
+        LOG(moba::INFO) << "closed connection <" << (size_t)connection.get() << "> with status code <" << status << ">" << std::endl;
     };
 
     echo.onerror = [](std::shared_ptr<WSServer::Connection> connection, const boost::system::error_code& ec) {
-        LOG(moba::INFO) << "error in connection <" << (size_t)connection.get() << ">. <" << ec << ":" << ec.message() << ">";
+        LOG(moba::INFO) << "error in connection <" << (size_t)connection.get() << ">. <" << ec << ":" << ec.message() << ">" << std::endl;
     };
 
     std::thread serverThread([this](){
@@ -56,14 +56,14 @@ void MessageLoop::run() {
         if(!msg) {
             continue;
         }
-        LOG(moba::NOTICE) << "New Message <" << *msg << ">";
+        LOG(moba::NOTICE) << "New Message <" << *msg << ">" << std::endl;
         this->msgBuffer[msg->getMsgType()] = msg->getRawMessage();
         this->sendMessage(msg->getRawMessage());
     }
 }
 
 void MessageLoop::connect(const std::string &host, int port) {
-    LOG(moba::INFO) << "Try to connect (" << host << ":" << port << ")...";
+    LOG(moba::INFO) << "Try to connect (" << host << ":" << port << ")..." << std::endl;
     this->msgHandler.connect(host, port);
     moba::JsonArrayPtr groups(new moba::JsonArray());
     groups->push_back(moba::toJsonStringPtr("BASE"));
@@ -75,7 +75,7 @@ void MessageLoop::connect(const std::string &host, int port) {
         this->version,
         groups
     );
-    LOG(moba::NOTICE) << "AppId <" << this->appId << ">";
+    LOG(moba::NOTICE) << "AppId <" << this->appId << ">" << std::endl;
 }
 
 void MessageLoop::init() {
@@ -86,7 +86,7 @@ void MessageLoop::init() {
 /*
     echo.onmessage = [&server](shared_ptr<WsServer::Connection> connection, shared_ptr<WsServer::Message> message) {
         auto message_str = message->string();
-        LOG(moba::INFO) << "message received: <" << message_str << "> from <" << (size_t)connection.get() << ">";
+        LOG(moba::INFO) << "message received: <" << message_str << "> from <" << (size_t)connection.get() << ">" << std::endl;
 
 
 
@@ -107,7 +107,7 @@ void MessageLoop::init() {
 }
 
 void MessageLoop::sendMessage(const std::string &data) {
-    LOG(moba::INFO) << "send data <" << data << "> to connections ";
+    LOG(moba::INFO) << "send data <" << data << "> to connections" << std::endl;
     for(auto con : this->server.get_connections()) {
         auto send_stream = std::make_shared<WSServer::SendStream>();
         *send_stream << data;

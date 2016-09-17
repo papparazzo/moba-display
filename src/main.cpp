@@ -58,24 +58,24 @@ int main(int argc, char *argv[]) {
     printAppData(appData);
 
     if(!moba::setCoreFileSizeToULimit()) {
-        LOG(moba::WARNING) << "Could not set corefile-size to unlimited";
+        LOG(moba::WARNING) << "Could not set corefile-size to unlimited" << std::endl;
     }
 
     /*
     if(geteuid() != 0) {
-        LOG(tlog::Error) << "This daemon can only be run by root user, exiting";
+        LOG(tlog::Error) << "This daemon can only be run by root user, exiting" << std::endl;
 	    exit(EXIT_FAILURE);
 	}
 
     int fh = open(pidfile, O_RDWR | O_CREAT, 0644);
 
     if(fh == -1) {
-        LOG(tlog::Error) << "Could not open PID lock file <" << pidfile << ">, exiting";
+        LOG(tlog::Error) << "Could not open PID lock file <" << pidfile << ">, exiting" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     if(lockf(fh, F_TLOCK, 0) == -1) {
-        LOG(tlog::Error) << "Could not lock PID lock file <" << pidfile << ">, exiting";
+        LOG(tlog::Error) << "Could not lock PID lock file <" << pidfile << ">, exiting" << std::endl;
         exit(EXIT_FAILURE);
     }
 */
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
             loop.run();
             exit(EXIT_SUCCESS);
         } catch(std::exception &e) {
-            LOG(moba::NOTICE) << e.what();
+            LOG(moba::NOTICE) << e.what() << std::endl;
             sleep(4);
         }
     }
