@@ -1,7 +1,7 @@
 /*
- *  Expression project.displayName is undefined on line 4, column 20 in Templates/Licenses/license-default.txt.
+ *  Project:    moba-display
  *
- *  Copyright (C) 2016 stefan
+ *  Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,6 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
  *
  */
-
 
 function drawClock() {
     if(!(minute = ++minute % 60)) {
