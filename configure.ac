@@ -10,10 +10,15 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_CXX
+AC_PROG_CC
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lMoBaCommon':
 AC_CHECK_LIB([MoBaCommon], [main])
+# FIXME: Replace `main' with a function in `-lboost_filesystem':
+AC_CHECK_LIB([boost_filesystem], [main])
+# FIXME: Replace `main' with a function in `-lboost_thread':
+AC_CHECK_LIB([boost_thread], [main])
 # FIXME: Replace `main' with a function in `-lboost_regex':
 AC_CHECK_LIB([boost_regex], [main])
 # FIXME: Replace `main' with a function in `-lboost_system':
@@ -24,6 +29,7 @@ AC_CHECK_LIB([crypto], [main])
 AC_CHECK_LIB([ssl], [main])
 
 # Checks for header files.
+AC_CHECK_HEADERS([fenv.h float.h inttypes.h limits.h locale.h stddef.h stdint.h stdlib.h string.h wchar.h wctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

@@ -5,8 +5,9 @@
     https://github.com/eidheim/Simple-Web-Server
 
         applies to:
-        - src/web/server_ws.hpp
         - src/web/crypto.hpp
+        - src/web/server_http.hpp
+        - src/web/server_ws.hpp
    
     Copyright (c) jQuery Foundation;
     https://jquery.org/
