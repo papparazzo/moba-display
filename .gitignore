@@ -55,3 +55,8 @@ Makefile.in
 /moba-tester
 /core
 /response.log
+
+# misc
+
+.deps/
+.dirstamp
