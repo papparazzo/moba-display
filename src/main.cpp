@@ -25,7 +25,6 @@
 #include <moba/log.h>
 #include <moba/version.h>
 #include <moba/helper.h>
-#include <moba/helper.h>
 
 #include <config.h>
 
