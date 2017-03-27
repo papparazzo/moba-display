@@ -44,7 +44,7 @@ MessageLoop::MessageLoop(
         LOG(moba::INFO) << "error in connection <" << (size_t)connection.get() << ">. <" << ec << ":" << ec.message() << ">" << std::endl;
     };
 
-    std::thread serverThread([this](){
+    std::thread serverThread([this]() {
         this->server.start();
     });
     serverThread.detach();
