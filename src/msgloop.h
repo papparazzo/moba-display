@@ -27,7 +27,7 @@
 
 #include "web/server_ws.hpp"
 
-#include <moba/msghandler.h>
+#include <moba/msgendpoint.h>
 #include <moba/log.h>
 
 class MessageLoop : private boost::noncopyable {
@@ -35,23 +35,18 @@ class MessageLoop : private boost::noncopyable {
         typedef SimpleWeb::SocketServer<SimpleWeb::WS> WSServer;
 
         MessageLoop(
-            const std::string &appName,
-            const moba::Version &version,
+            moba::MsgEndpointPtr msgEndpoint,
             unsigned short port,
             size_t numThreads
         );
 
         void run();
         void init();
-        void connect(const std::string &host, int port);
 
     protected:
         void sendMessage(const std::string &data);
 
         WSServer server;
-        moba::MsgHandler msgHandler;
-        long appId;
-        std::string appName;
-        moba::Version version;
+        moba::MsgEndpointPtr msgEndpoint;
         std::map<moba::Message::MessageType, std::string> msgBuffer;
 };

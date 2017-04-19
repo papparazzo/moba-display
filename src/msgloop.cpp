@@ -22,17 +22,16 @@
 
 #include "msgloop.h"
 
-MessageLoop::MessageLoop(
-    const std::string &appName, const moba::Version &version,
-    unsigned short port, size_t numThreads
-) : appName{appName}, version{version}, server{port, numThreads} {
-    auto& echo = this->server.endpoint["^/diplay/?$"];
+MessageLoop::MessageLoop(moba::MsgEndpointPtr msgEndpoint, unsigned short port, size_t numThreads) :
+    msgEndpoint{msgEndpoint}, server{port, numThreads}
+{
+    auto& echo = server.endpoint["^/diplay/?$"];
     echo.onopen = [this](std::shared_ptr<WSServer::Connection> con) {
         LOG(moba::INFO) << "opened connection <" << (size_t)con.get() << ">" << std::endl;
-        for(auto item : this->msgBuffer) {
+        for(auto item : msgBuffer) {
             auto send_stream = std::make_shared<WSServer::SendStream>();
             *send_stream << item.second;
-            this->server.send(con, send_stream);
+            server.send(con, send_stream);
         }
     };
 
@@ -45,44 +44,25 @@ MessageLoop::MessageLoop(
     };
 
     std::thread serverThread([this]() {
-        this->server.start();
+        server.start();
     });
     serverThread.detach();
 }
 
 void MessageLoop::run() {
     while(true) {
-        moba::MessagePtr msg = this->msgHandler.recieveMsg();
+        moba::MessagePtr msg = msgEndpoint->recieveMsg();
         if(!msg) {
+            usleep(20000);
             continue;
         }
         LOG(moba::NOTICE) << "New Message <" << *msg << ">" << std::endl;
-        this->msgBuffer[msg->getMsgType()] = msg->getRawMessage();
-        this->sendMessage(msg->getRawMessage());
+        msgBuffer[msg->getMsgType()] = msg->getRawMessage();
+        sendMessage(msg->getRawMessage());
     }
 }
 
-void MessageLoop::connect(const std::string &host, int port) {
-    LOG(moba::INFO) << "Try to connect (" << host << ":" << port << ")..." << std::endl;
-    this->msgHandler.connect(host, port);
-    moba::JsonArrayPtr groups(new moba::JsonArray());
-    groups->push_back(moba::toJsonStringPtr("BASE"));
-    groups->push_back(moba::toJsonStringPtr("ENV"));
-    groups->push_back(moba::toJsonStringPtr("SYSTEM"));
-
-    this->appId = this->msgHandler.registerApp(
-        this->appName,
-        this->version,
-        groups
-    );
-    LOG(moba::NOTICE) << "AppId <" << this->appId << ">" << std::endl;
-}
-
 void MessageLoop::init() {
-    this->msgHandler.sendGetHardwareState();
-    this->msgHandler.sendGetAutoMode();
-    this->msgHandler.sendGetColorTheme();
-    this->msgHandler.sendGetEnvironment();
 /*
     echo.onmessage = [&server](shared_ptr<WsServer::Connection> connection, shared_ptr<WsServer::Message> message) {
         auto message_str = message->string();

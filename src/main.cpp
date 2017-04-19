@@ -25,6 +25,8 @@
 #include <moba/log.h>
 #include <moba/version.h>
 #include <moba/helper.h>
+#include <moba/jsonabstractitem.h>
+#include <moba/message.h>
 
 #include <config.h>
 
@@ -40,25 +42,12 @@ namespace {
         7000
     };
 
-    std::string pidfile = "/var/run/environment.pid";
+    std::string pidfile = "/var/run/" PACKAGE_NAME ".pid";
 }
 
 int main(int argc, char *argv[]) {
-    switch(argc) {
-        case 3:
-            appData.port = atoi(argv[2]);
-
-        case 2:
-            appData.host = std::string(argv[1]);
-
-        default:
-            break;
-    }
     printAppData(appData);
-
-    if(!moba::setCoreFileSizeToULimit()) {
-        LOG(moba::WARNING) << "Could not set corefile-size to unlimited" << std::endl;
-    }
+    moba::setCoreFileSizeToULimit();
 
     /*
     if(geteuid() != 0) {
@@ -78,11 +67,25 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 */
+    moba::MsgEndpointPtr msgEndpoint(new moba::MsgEndpoint(appData.host, appData.port));
+
+    moba::JsonArrayPtr groups(new moba::JsonArray());
+    groups->push_back(moba::toJsonStringPtr("BASE"));
+    groups->push_back(moba::toJsonStringPtr("ENV"));
+    groups->push_back(moba::toJsonStringPtr("SYSTEM"));
+
     while(true) {
         try {
-            MessageLoop loop(appData.appName, appData.version, 8008, 4);
-            loop.connect(appData.host, appData.port);
-            loop.init();
+            msgEndpoint->connect(
+                appData.appName,
+                appData.version,
+                moba::JsonArrayPtr{new moba::JsonArray()}
+            );
+            msgEndpoint->sendMsg(moba::Message::MT_GET_HARDWARE_STATE);
+            msgEndpoint->sendMsg(moba::Message::MT_GET_AUTO_MODE);
+            msgEndpoint->sendMsg(moba::Message::MT_GET_COLOR_THEME);
+            msgEndpoint->sendMsg(moba::Message::MT_GET_ENVIRONMENT);
+            MessageLoop loop(msgEndpoint , 8008, 4);
             loop.run();
             exit(EXIT_SUCCESS);
         } catch(std::exception &e) {
