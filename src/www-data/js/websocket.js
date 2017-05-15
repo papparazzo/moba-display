@@ -25,7 +25,7 @@ $(document).ready(function() {
     var clkID = setInterval(drawClock, (1000));
 
     var ws;
-    ws = new WebSocket("ws://192.168.178.20:8008/diplay");
+    ws = new WebSocket("ws://localhost:8008/diplay");
     ws.onmessage = function(event) {
         var d = JSON.parse(event.data);
         switch(d.msgType) {
