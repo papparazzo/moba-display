@@ -70,7 +70,6 @@ int main(int argc, char *argv[]) {
     moba::MsgEndpointPtr msgEndpoint(new moba::MsgEndpoint(appData.host, appData.port));
 
     moba::JsonArrayPtr groups(new moba::JsonArray());
-    groups->push_back(moba::toJsonStringPtr("BASE"));
     groups->push_back(moba::toJsonStringPtr("ENV"));
     groups->push_back(moba::toJsonStringPtr("SYSTEM"));
 
@@ -82,7 +81,6 @@ int main(int argc, char *argv[]) {
                 moba::JsonArrayPtr{new moba::JsonArray()}
             );
             msgEndpoint->sendMsg(moba::Message::MT_GET_HARDWARE_STATE);
-            msgEndpoint->sendMsg(moba::Message::MT_GET_AUTO_MODE);
             msgEndpoint->sendMsg(moba::Message::MT_GET_COLOR_THEME);
             msgEndpoint->sendMsg(moba::Message::MT_GET_ENVIRONMENT);
             MessageLoop loop(msgEndpoint , 8008, 4);
