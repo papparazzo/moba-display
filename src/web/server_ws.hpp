@@ -225,7 +225,7 @@ namespace SimpleWeb {
             //If num_threads>1, start m_io_service.run() in (num_threads-1) threads for thread-pooling
             threads.clear();
             for(size_t c=1;c<config.num_threads;c++) {
-                threads.emplace_back([this](){
+                threads.emplace_back([this]() {
                     io_service.run();
                 });
             }
@@ -335,7 +335,7 @@ namespace SimpleWeb {
         std::shared_ptr<boost::asio::deadline_timer> set_timeout_on_connection(std::shared_ptr<Connection> connection, size_t seconds) {
             std::shared_ptr<boost::asio::deadline_timer> timer(new boost::asio::deadline_timer(io_service));
             timer->expires_from_now(boost::posix_time::seconds(static_cast<long>(seconds)));
-            timer->async_wait([connection](const boost::system::error_code& ec){
+            timer->async_wait([connection](const boost::system::error_code& ec) {
                 if(!ec) {
                     connection->socket->lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both);
                     connection->socket->lowest_layer().close();
@@ -638,7 +638,7 @@ namespace SimpleWeb {
         }
 
         void timer_idle_expired_function(std::shared_ptr<Connection> connection) const {
-            connection->timer_idle->async_wait([this, connection](const boost::system::error_code& ec){
+            connection->timer_idle->async_wait([this, connection](const boost::system::error_code& ec) {
                 if(!ec) {
                     //1000=normal closure
                     send_close(connection, 1000, "idle timeout");

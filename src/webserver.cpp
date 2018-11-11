@@ -22,7 +22,7 @@
 
 WebServer::WebServer(int port) {
     this->server.config.port = 8080;
-    
+
     std::thread serverThread([this]() {
         this->server.start();
     });
@@ -57,7 +57,7 @@ void default_resource_send(
         response->write(&buffer[0], read_length);
         if(read_length == static_cast<std::streamsize>(buffer.size())) {
             server.send(response, [&server, response, ifs](const boost::system::error_code &ec) {
-                if(!ec){
+                if(!ec) {
                     default_resource_send(server, response, ifs);
                 } else {
                     std::cerr << "Connection interrupted" << std::endl;
@@ -86,17 +86,17 @@ int main() {
 
             auto ifs = std::make_shared<std::ifstream>();
             ifs->open(path.string(), std::ifstream::in | std::ios::binary | std::ios::ate);
-            
+
             if(!*ifs) {
                 throw std::invalid_argument("could not read file");
             }
             auto length=ifs->tellg();
             ifs->seekg(0, std::ios::beg);
 
-            *response << 
-                "HTTP/1.1 200 OK\r\n" << 
+            *response <<
+                "HTTP/1.1 200 OK\r\n" <<
                 "Content-Length: " << length << "\r\n\r\n";
-            
+
             default_resource_send(server, response, ifs);
         } catch(const std::exception &e) {
             std::string content = "Could not open path " + request->path + ": " + e.what();
