@@ -28,10 +28,10 @@ class WebServer {
         WebServer(const WebServer& orig);
         virtual ~WebServer();
 
-        typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
-        
+        using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+
     protected:
-        HttpServer server;    
+        HttpServer server;
 
     private:
 

@@ -32,7 +32,7 @@
 
 class MessageLoop : private boost::noncopyable {
     public:
-        typedef SimpleWeb::SocketServer<SimpleWeb::WS> WSServer;
+        using WSServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
 
         MessageLoop(
             moba::MsgEndpointPtr msgEndpoint,
