@@ -20,13 +20,13 @@
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
+#include "moba/socket.h"
+#include "moba/endpoint.h"
 
 #include <moba/log.h>
 #include <moba/version.h>
 #include <moba/helper.h>
 #include <moba/jsonabstractitem.h>
-#include <moba/message.h>
 
 #include <config.h>
 
@@ -67,22 +67,21 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 */
-    moba::MsgEndpointPtr msgEndpoint(new moba::MsgEndpoint(appData.host, appData.port));
 
-    moba::JsonArrayPtr groups(new moba::JsonArray());
+    auto groups = std::make_shared<moba::JsonArray>();
     groups->push_back(moba::toJsonStringPtr("ENV"));
     groups->push_back(moba::toJsonStringPtr("SYSTEM"));
 
+    auto socket = std::make_shared<Socket>(appData.host, appData.port);
+    auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
+
     while(true) {
         try {
-            msgEndpoint->connect(
-                appData.appName,
-                appData.version,
-                moba::JsonArrayPtr{new moba::JsonArray()}
-            );
-            msgEndpoint->sendMsg(moba::Message::MT_GET_HARDWARE_STATE);
-            msgEndpoint->sendMsg(moba::Message::MT_GET_COLOR_THEME);
-            msgEndpoint->sendMsg(moba::Message::MT_GET_ENVIRONMENT);
+            endpoint->connect();
+
+//            msgEndpoint->sendMsg(moba::Message::MT_GET_HARDWARE_STATE);
+//            msgEndpoint->sendMsg(moba::Message::MT_GET_COLOR_THEME);
+//            msgEndpoint->sendMsg(moba::Message::MT_GET_ENVIRONMENT);
             MessageLoop loop(msgEndpoint , 8008, 4);
             loop.run();
             exit(EXIT_SUCCESS);
