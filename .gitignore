@@ -58,11 +58,9 @@ Makefile.in
 # Executables
 *.out
 *.app
-/.libs/libMoBaCommon.so.0.0.0
-/.libs/libMoBaCommon.so.0
+/src/moba-display
 /libtool
 /config.status
-/moba-display
 /configure.scan
 /autoscan.log
 /response.log
@@ -73,3 +71,6 @@ Makefile.in
 
 .deps/
 .dirstamp
+/src/Makefile
+/src/.libs/libMoBaCommon.so.0.0.0
+/src/.libs/libMoBaCommon.so.0
