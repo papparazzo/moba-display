@@ -38,7 +38,7 @@ namespace {
         moba::Version(PACKAGE_VERSION),
         __DATE__,
         __TIME__,
-        "localhost",
+        "::1",
         7000
     };
 
