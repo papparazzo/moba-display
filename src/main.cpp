@@ -82,11 +82,11 @@ int main(int argc, char *argv[]) {
 //            msgEndpoint->sendMsg(moba::Message::MT_GET_HARDWARE_STATE);
 //            msgEndpoint->sendMsg(moba::Message::MT_GET_COLOR_THEME);
 //            msgEndpoint->sendMsg(moba::Message::MT_GET_ENVIRONMENT);
-            MessageLoop loop(msgEndpoint , 8008, 4);
+            MessageLoop loop(endpoint , 8008, 4);
             loop.run();
             exit(EXIT_SUCCESS);
         } catch(std::exception &e) {
-            LOG(moba::NOTICE) << e.what() << std::endl;
+            LOG(moba::LogLevel::NOTICE) << e.what() << std::endl;
             sleep(4);
         }
     }
