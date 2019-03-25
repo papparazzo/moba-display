@@ -22,6 +22,9 @@
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
+#include "moba/systemhandler.h"
+#include "moba/timerhandler.h"
+#include "moba/environmenthandler.h"
 
 #include <moba/log.h>
 #include <moba/version.h>
@@ -78,10 +81,9 @@ int main(int argc, char *argv[]) {
     while(true) {
         try {
             endpoint->connect();
-
-//            msgEndpoint->sendMsg(moba::Message::MT_GET_HARDWARE_STATE);
-//            msgEndpoint->sendMsg(moba::Message::MT_GET_COLOR_THEME);
-//            msgEndpoint->sendMsg(moba::Message::MT_GET_ENVIRONMENT);
+            endpoint->sendMsg(SystemGetHardwareState{});
+            endpoint->sendMsg(TimerGetColorTheme{});
+            endpoint->sendMsg(EnvGetEnvironment{});
             MessageLoop loop(endpoint , 8008, 4);
             loop.run();
             exit(EXIT_SUCCESS);
