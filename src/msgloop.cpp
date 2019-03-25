@@ -22,9 +22,9 @@
 
 #include "msgloop.h"
 
-MessageLoop::MessageLoop(moba::MsgEndpointPtr msgEndpoint, unsigned short port, size_t numThreads) :
-    msgEndpoint{msgEndpoint}, server{port, numThreads}
-{
+MessageLoop::MessageLoop(
+    EndpointPtr endpoint, unsigned short port, size_t numThreads
+) : endpoint{endpoint}, server{port, numThreads} {
     auto& echo = server.endpoint["^/diplay/?$"];
     echo.onopen = [this](std::shared_ptr<WSServer::Connection> con) {
         LOG(moba::INFO) << "opened connection <" << (size_t)con.get() << ">" << std::endl;

@@ -26,8 +26,8 @@
 #include <boost/noncopyable.hpp>
 
 #include "web/server_ws.hpp"
+#include "moba/endpoint.h"
 
-#include <moba/msgendpoint.h>
 #include <moba/log.h>
 
 class MessageLoop : private boost::noncopyable {
@@ -35,7 +35,7 @@ class MessageLoop : private boost::noncopyable {
         using WSServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
 
         MessageLoop(
-            moba::MsgEndpointPtr msgEndpoint,
+            EndpointPtr endpoint,
             unsigned short port,
             size_t numThreads
         );
@@ -47,6 +47,6 @@ class MessageLoop : private boost::noncopyable {
         void sendMessage(const std::string &data);
 
         WSServer server;
-        moba::MsgEndpointPtr msgEndpoint;
+        EndpointPtr endpoint;
         std::map<moba::Message::MessageType, std::string> msgBuffer;
 };
