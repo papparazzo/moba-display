@@ -30,7 +30,7 @@ MessageLoop::MessageLoop(
         LOG(moba::INFO) << "opened connection <" << (size_t)con.get() << ">" << std::endl;
         for(auto item : msgBuffer) {
             auto send_stream = std::make_shared<WSServer::SendStream>();
-            *send_stream << item.second;
+            *send_stream << item;
             server.send(con, send_stream);
         }
     };
@@ -51,14 +51,13 @@ MessageLoop::MessageLoop(
 
 void MessageLoop::run() {
     while(true) {
-        moba::MessagePtr msg = msgEndpoint->recieveMsg();
-        if(!msg) {
+        auto msg = endpoint->recieveMsg();
+        if(!(*msg)) {
             usleep(20000);
             continue;
         }
-        LOG(moba::NOTICE) << "New Message <" << *msg << ">" << std::endl;
-        msgBuffer[msg->getMsgType()] = msg->getRawMessage();
-        sendMessage(msg->getRawMessage());
+        msgBuffer.push_back(msg->getJsonString());
+        sendMessage(msg->getJsonString());
     }
 }
 

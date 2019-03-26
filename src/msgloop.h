@@ -21,7 +21,7 @@
 #pragma once
 
 #include <string>
-#include <map>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -48,5 +48,5 @@ class MessageLoop : private boost::noncopyable {
 
         WSServer server;
         EndpointPtr endpoint;
-        std::map<moba::Message::MessageType, std::string> msgBuffer;
+        std::vector<std::string> msgBuffer;
 };
