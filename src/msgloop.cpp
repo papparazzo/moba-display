@@ -51,11 +51,7 @@ MessageLoop::MessageLoop(
 
 void MessageLoop::run() {
     while(true) {
-        auto msg = endpoint->recieveMsg();
-        if(!(*msg)) {
-            usleep(20000);
-            continue;
-        }
+        auto msg = endpoint->waitForNewMsg();
         msgBuffer.push_back(msg->getJsonString());
         sendMessage(msg->getJsonString());
     }
