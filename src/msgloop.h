@@ -28,7 +28,7 @@
 #include "web/server_ws.hpp"
 #include "moba/endpoint.h"
 
-#include <moba/log.h>
+#include <moba-common/log.h>
 
 class MessageLoop : private boost::noncopyable {
     public:
