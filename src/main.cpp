@@ -22,23 +22,22 @@
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
-#include "moba/systemhandler.h"
-#include "moba/timerhandler.h"
+#include "moba/systemmessage.h"
+#include "moba/timermessage.h"
 #include "moba/environmenthandler.h"
 
-#include <moba/log.h>
-#include <moba/version.h>
-#include <moba/helper.h>
-#include <moba/jsonabstractitem.h>
+#include <moba-common/log.h>
+#include <moba-common/version.h>
+#include <moba-common/helper.h>
 
 #include <config.h>
 
 #include "msgloop.h"
 
 namespace {
-    moba::AppData appData = {
+    moba::common::AppData appData = {
         PACKAGE_NAME,
-        moba::Version(PACKAGE_VERSION),
+        moba::common::Version(PACKAGE_VERSION),
         __DATE__,
         __TIME__,
         "::1",
@@ -50,7 +49,7 @@ namespace {
 
 int main(int argc, char *argv[]) {
     printAppData(appData);
-    moba::setCoreFileSizeToULimit();
+    moba::common::setCoreFileSizeToULimit();
 
     /*
     if(geteuid() != 0) {
@@ -71,12 +70,8 @@ int main(int argc, char *argv[]) {
     }
 */
 
-    auto groups = std::make_shared<moba::JsonArray>();
-    groups->push_back(moba::toJsonStringPtr("ENV"));
-    groups->push_back(moba::toJsonStringPtr("SYSTEM"));
-
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = std::make_shared<Endpoint>(socket, appData.appName, appData.version, groups);
+    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::ENVIRONMENT, Message::SYSTEM}}};
 
     while(true) {
         try {
@@ -88,7 +83,7 @@ int main(int argc, char *argv[]) {
             loop.run();
             exit(EXIT_SUCCESS);
         } catch(std::exception &e) {
-            LOG(moba::LogLevel::NOTICE) << e.what() << std::endl;
+            LOG(moba::common::LogLevel::NOTICE) << e.what() << std::endl;
             sleep(4);
         }
     }
