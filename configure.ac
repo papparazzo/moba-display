@@ -19,7 +19,7 @@ AC_CONFIG_SUBDIRS([modules/lib-msghandling])
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lMoBaCommon':
-AC_CHECK_LIB([MoBaCommon], [main])
+AC_CHECK_LIB([mobacommon], [main])
 # FIXME: Replace `main' with a function in `-lboost_filesystem':
 AC_CHECK_LIB([boost_filesystem], [main])
 # FIXME: Replace `main' with a function in `-lboost_thread':

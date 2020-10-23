@@ -4,7 +4,7 @@ moba_display_SOURCES = \
     msgloop.cpp
 
 moba_display_LDADD = \
-    -lMoBaCommon -lssl -lcrypto -lboost_regex -lboost_system -lboost_filesystem \
+    -lmobacommon -lssl -lcrypto -lboost_regex -lboost_system -lboost_filesystem \
     $(srcdir)/../modules/lib-msghandling/src/moba/libmsghandling.a
 
 LDFLAGS += -L/usr/local/lib -pthread -L/usr/lib/i386-linux-gnu/ -pthread
