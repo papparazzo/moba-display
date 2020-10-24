@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "webserver.h"
+
 #include "moba/socket.h"
 #include "moba/endpoint.h"
 #include "moba/systemmessage.h"
@@ -69,6 +71,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 */
+
+    runWebServer();
 
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::ENVIRONMENT, Message::SYSTEM}}};

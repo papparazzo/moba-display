@@ -20,21 +20,4 @@
 
 #pragma once
 
-#include "web/server_http.hpp"
-
-class WebServer {
-    public:
-        WebServer(int port = 8080);
-        WebServer(const WebServer& orig);
-        virtual ~WebServer();
-
-        using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
-
-    protected:
-        HttpServer server;
-
-    private:
-
-};
-
-
+void runWebServer(unsigned short port = 8080);

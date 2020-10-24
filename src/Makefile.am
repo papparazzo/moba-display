@@ -1,7 +1,8 @@
 bin_PROGRAMS = moba-display
 moba_display_SOURCES = \
     main.cpp \
-    msgloop.cpp
+    msgloop.cpp \
+    webserver.cpp
 
 moba_display_LDADD = \
     -lmobacommon -lssl -lcrypto -lboost_regex -lboost_system -lboost_filesystem \

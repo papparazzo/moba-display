@@ -1,19 +1,6 @@
------------------------------------------------------------------------------
-                        The MIT License (MIT)
+The MIT License (MIT)
 
-    Copyright (c) 2014-2016 Ole Christian Eidheim;
-    https://gitlab.com/eidheim/Simple-WebSocket-Server
-
-        applies to:
-        - src/web/*.hpp
-
-    Copyright (c) jQuery Foundation;
-    https://jquery.org/
-
-        applies to:
-        - src/www-data/js/jquery-3.1.0.min.js
-
------------------------------------------------------------------------------
+Copyright (c) 2014-2020 Ole Christian Eidheim
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
