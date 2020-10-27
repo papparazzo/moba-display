@@ -20,4 +20,16 @@
 
 #pragma once
 
-void runWebServer(unsigned short port = 8080);
+#include "moba/endpoint.h"
+#include <boost/noncopyable.hpp>
+
+class WebServer : private boost::noncopyable {
+public:
+    WebServer(EndpointPtr endpoint, unsigned short port = 8080);
+    void run();
+
+protected:
+    EndpointPtr endpoint;
+    unsigned short port;
+
+};

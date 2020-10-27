@@ -19,85 +19,90 @@
  */
 
 #include "webserver.h"
+#include "resourceloader.h"
 
 #include "web/server_http.hpp"
+#include "web/server_ws.hpp"
+
+#include "moba/systemmessage.h"
+#include "moba/timermessage.h"
+#include "moba/environmenthandler.h"
+
 #include <future>
 
+#include <unordered_set>
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <vector>
 
+const size_t delay = 1000; //delay in milliseconds
+
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
+using WsServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
 
-void runWebServer(unsigned short port) {
-    HttpServer server;
-    server.config.port = port;
-    server.default_resource["GET"] = [](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
-        try {
-            auto web_root_path = boost::filesystem::canonical("www-data");
-            auto path = boost::filesystem::canonical(web_root_path / request->path);
-            // Check if path is within web_root_path
-            if(
-                std::distance(web_root_path.begin(), web_root_path.end()) > std::distance(path.begin(), path.end()) ||
-                !std::equal(web_root_path.begin(), web_root_path.end(), path.begin())
-            ) {
-                throw std::invalid_argument("path must be within root path");
-            }
+WebServer::WebServer(EndpointPtr endpoint, unsigned short port) : endpoint{endpoint}, port{port} {
+}
 
-            if(boost::filesystem::is_directory(path)) {
-                path /= "index.html";
-            }
+void WebServer::run() {
+    auto io_service = std::make_shared<SimpleWeb::asio::io_service>();
+    HttpServer httpServer;
+    httpServer.config.port = port;
+    httpServer.io_service = io_service;
 
-            SimpleWeb::CaseInsensitiveMultimap header;
+    WsServer wsServer;
+    auto &wsEndpoint = wsServer.endpoint["^/diplay/?$"];
+    std::thread msgThread([&,this]() {
+        std::shared_ptr<WsServer::OutMessage> out_message;
+        while(true) {
+            try {
+                endpoint->connect();
+                endpoint->sendMsg(SystemGetHardwareState{});
+                endpoint->sendMsg(TimerGetColorTheme{});
+                endpoint->sendMsg(EnvGetEnvironment{});
+                while(true) {
+                    std::promise<void> promise;
+                    std::string data = endpoint->waitForNewMsg2();
 
-            auto ifs = std::make_shared<std::ifstream>();
-            ifs->open(path.string(), std::ifstream::in | std::ios::binary | std::ios::ate);
-
-            if(!*ifs) {
-                throw std::invalid_argument("could not read file");
-            }
-            auto length = ifs->tellg();
-            ifs->seekg(0, std::ios::beg);
-
-            header.emplace("Content-Length", std::to_string(length));
-            response->write(header);
-
-            // Trick to define a recursive function within this scope (for example purposes)
-            class FileServer {
-                public:
-                    static void read_and_send(const std::shared_ptr<HttpServer::Response> &response, const std::shared_ptr<std::ifstream> &ifs) {
-                        // Read and send 128 KB at a time
-                        static std::vector<char> buffer(131072); // Safe when server is running on one thread
-                        std::streamsize read_length;
-                        if((read_length = ifs->read(&buffer[0], static_cast<std::streamsize>(buffer.size())).gcount()) <= 0) {
-                            return;
+                    io_service->post([&] {
+                        for(auto &a_connection : wsEndpoint.get_connections()) {
+                            a_connection->send(data, [](const boost::system::error_code &ec) {}, 130);
                         }
-                        response->write(&buffer[0], read_length);
-                        if(read_length != static_cast<std::streamsize>(buffer.size())) {
-                            return;
-                        }
-                        response->send([response, ifs](const SimpleWeb::error_code &ec) {
-                            if(!ec) {
-                                read_and_send(response, ifs);
-                            }
-                        });
-                    }
-            };
-            FileServer::read_and_send(response, ifs);
-
-        } catch(const std::exception &e) {
-            response->write(SimpleWeb::StatusCode::client_error_bad_request, "Could not open path " + request->path + ": " + e.what());
+                        promise.set_value();
+                    });
+                    promise.get_future().wait();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+                }
+                exit(EXIT_SUCCESS);
+            } catch(std::exception &e) {
+                //LOG(moba::common::LogLevel::NOTICE) << e.what() << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(4));
+            }
         }
+    });
+    wsEndpoint.on_message = [this](std::shared_ptr<WsServer::Connection> connection, std::shared_ptr<WsServer::InMessage> in_message) {
+        auto out_message = in_message->string();
+        //endpoint->sendMsg();
+
+        std::cout << "Server: Message received: \"" << out_message << "\" from " << connection.get() << std::endl;
     };
 
-    // Start server and receive assigned port when server is listening for requests
-    std::promise<unsigned short> server_port;
-    std::thread server_thread([&server, &server_port]() {
-        // Start server
-        server.start([&server_port](unsigned short port) {
-            server_port.set_value(port);
-        });
-    });
-    server_thread.join();
+    ResourceLoader loader;
+    httpServer.default_resource["GET"] = loader;
+
+    httpServer.on_upgrade = [&wsServer](std::unique_ptr<SimpleWeb::HTTP> &socket, std::shared_ptr<HttpServer::Request> request) {
+        auto connection = std::make_shared<WsServer::Connection>(std::move(socket));
+        connection->method = std::move(request->method);
+        connection->path = std::move(request->path);
+        connection->http_version = std::move(request->http_version);
+        connection->header = std::move(request->header);
+        wsServer.upgrade(connection);
+    };
+    httpServer.start();
+    io_service->run();
+    msgThread.join();
+
+
+    //system("xdg-open http://localhost:8080/");
+
 }

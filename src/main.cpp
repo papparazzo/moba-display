@@ -24,17 +24,12 @@
 
 #include "moba/socket.h"
 #include "moba/endpoint.h"
-#include "moba/systemmessage.h"
-#include "moba/timermessage.h"
-#include "moba/environmenthandler.h"
 
 #include <moba-common/log.h>
 #include <moba-common/version.h>
 #include <moba-common/helper.h>
 
 #include <config.h>
-
-#include "msgloop.h"
 
 namespace {
     moba::common::AppData appData = {
@@ -72,23 +67,9 @@ int main(int argc, char *argv[]) {
     }
 */
 
-    runWebServer();
-
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
     auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::ENVIRONMENT, Message::SYSTEM}}};
 
-    while(true) {
-        try {
-            endpoint->connect();
-            endpoint->sendMsg(SystemGetHardwareState{});
-            endpoint->sendMsg(TimerGetColorTheme{});
-            endpoint->sendMsg(EnvGetEnvironment{});
-            MessageLoop loop(endpoint , 8008, 4);
-            loop.run();
-            exit(EXIT_SUCCESS);
-        } catch(std::exception &e) {
-            LOG(moba::common::LogLevel::NOTICE) << e.what() << std::endl;
-            sleep(4);
-        }
-    }
+    WebServer webserver(endpoint);
+    webserver.run();
 }
