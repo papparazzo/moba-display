@@ -53,7 +53,6 @@ void WebServer::run() {
     WsServer wsServer;
     auto &wsEndpoint = wsServer.endpoint["^/diplay/?$"];
     std::thread msgThread([&,this]() {
-        std::shared_ptr<WsServer::OutMessage> out_message;
         while(true) {
             try {
                 endpoint->connect();
@@ -62,29 +61,39 @@ void WebServer::run() {
                 endpoint->sendMsg(EnvGetEnvironment{});
                 while(true) {
                     std::promise<void> promise;
-                    std::string data = endpoint->waitForNewMsg2();
-
+                    auto data = endpoint->waitForNewMsgAsString();
                     io_service->post([&] {
                         for(auto &a_connection : wsEndpoint.get_connections()) {
-                            a_connection->send(data, [](const boost::system::error_code &ec) {}, 130);
+                            a_connection->send(data);
                         }
                         promise.set_value();
                     });
                     promise.get_future().wait();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
                 }
                 exit(EXIT_SUCCESS);
             } catch(std::exception &e) {
-                //LOG(moba::common::LogLevel::NOTICE) << e.what() << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(4));
             }
         }
     });
-    wsEndpoint.on_message = [this](std::shared_ptr<WsServer::Connection> connection, std::shared_ptr<WsServer::InMessage> in_message) {
-        auto out_message = in_message->string();
-        //endpoint->sendMsg();
+    wsEndpoint.on_message = [this](std::shared_ptr<WsServer::Connection> connection, std::shared_ptr<WsServer::InMessage> in) {
+        auto out = in->string();
 
-        std::cout << "Server: Message received: \"" << out_message << "\" from " << connection.get() << std::endl;
+        auto pos = out.find('#');
+        if(pos == std::string::npos) {
+            return;
+        }
+
+        auto pos1 = out.find('#', pos + 1);
+        if(pos1 == std::string::npos) {
+            return;
+        }
+
+        endpoint->sendMsg(
+            std::stoi(out.substr(0, pos)),
+            std::stoi(out.substr(pos + 1, pos1 - pos - 1)),
+            out.substr(pos1 + 1)
+        );
     };
 
     ResourceLoader loader;

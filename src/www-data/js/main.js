@@ -24,7 +24,7 @@
 
 
 var cnt = 60;
-
+/*
 var reloadFct = function() {
     $('#reload-counter').html("Nächster reload in " + cnt + " Sekunde(n)");
     cnt--;
@@ -42,3 +42,5 @@ $(document).ready(function() {
     ctx.translate(radius, radius);
     radius = radius * 0.90;
 });
+ *
+ */

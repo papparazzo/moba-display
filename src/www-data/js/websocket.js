@@ -21,13 +21,37 @@
 hour = 10;
 minute = 20;
 
-$(document).ready(function() {
-    var clkID = setInterval(drawClock, (1000));
+function handleSystemMessages(msgId, data) {
+    switch(msgId) {
+        case 5:
+            console.log(data);
+            break;
+    }
+}
 
-    var ws;
-    ws = new WebSocket("ws://localhost:8008/diplay");
+$(document).ready(function() {
+    //var clkID = setInterval(drawClock, (1000));
+
+
+    var ws = new WebSocket("ws://localhost:8080/diplay");
     ws.onmessage = function(event) {
+        console.debug("WebSocket message received:", event.data);
         var d = JSON.parse(event.data);
+        switch(d.groupId) {
+            case 7: // SYSTEM
+                handleSystemMessages(d.messageId, d.data);
+                break;
+        }
+    };
+
+    $('#emergencystop').click(function(){
+        ws.send("7#2#true");
+    });
+
+
+/*
+    ws.onmessage = function(event) {
+
         switch(d.msgType) {
             case "GLOBAL_TIMER_EVENT":
                 var t = d.msgData.curModelTime.split(" ");
@@ -80,4 +104,5 @@ $(document).ready(function() {
     window.onclose = function() {
         ws.close();
     };
+ */
 });
