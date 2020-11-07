@@ -51,7 +51,7 @@ void WebServer::run() {
     httpServer.io_service = io_service;
 
     WsServer wsServer;
-    auto &wsEndpoint = wsServer.endpoint["^/diplay/?$"];
+    auto &wsEndpoint = wsServer.endpoint["^/display/?$"];
     std::thread msgThread([&,this]() {
         while(true) {
             try {
