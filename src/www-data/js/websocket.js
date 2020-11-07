@@ -24,16 +24,34 @@ minute = 20;
 function handleSystemMessages(msgId, data) {
     switch(msgId) {
         case 5:
-            console.log(data);
+            switch(data) {
+                case 'MANUEL':
+                    $('#emergency-button')
+                        .addClass('btn-danger')
+                        .removeClass('btn-success')
+                        .html('Notaus')
+                        .data('msg', '7#2#true');
+                    break;
+
+                case 'EMERGENCY_STOP':
+                    $('#emergency-button')
+                        .addClass('btn-success')
+                        .removeClass('btn-danger')
+                        .html('Freigabe')
+                        .data('msg', '7#2#false');
+                    break;
+
+
+                    //<button id="emergency-button" type="button" class="btn-block btn-lg btn btn-danger">Notaus</button>
+                    //<button id="emergency-button" type="button" class="btn-block btn-lg btn btn-danger">Notaus</button>
+
+            }
             break;
     }
 }
 
 $(document).ready(function() {
-    //var clkID = setInterval(drawClock, (1000));
-
-
-    var ws = new WebSocket("ws://localhost:8080/diplay");
+    var ws = new WebSocket("ws://192.168.178.34:8080/display");
     ws.onmessage = function(event) {
         console.debug("WebSocket message received:", event.data);
         var d = JSON.parse(event.data);
@@ -43,9 +61,12 @@ $(document).ready(function() {
                 break;
         }
     };
+    ws.onopen = function(event) {
+        ws.send('7#4#');
+    };
 
-    $('#emergencystop').click(function(){
-        ws.send("7#2#true");
+    $('#emergency-button').click(function(){
+        ws.send($(this).data('msg'));
     });
 
 
@@ -96,13 +117,6 @@ $(document).ready(function() {
             default:
                 break;
         }
-    };
-    ws.onopen = function(evt) {
-        ws.send("Hball");
-    };
-
-    window.onclose = function() {
-        ws.close();
     };
  */
 });
