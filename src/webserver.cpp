@@ -27,6 +27,7 @@
 #include "moba/systemmessage.h"
 #include "moba/timermessage.h"
 #include "moba/environmenthandler.h"
+#include <moba-common/log.h>
 
 #include <future>
 
@@ -53,12 +54,12 @@ void WebServer::run() {
     WsServer wsServer;
     auto &wsEndpoint = wsServer.endpoint["^/display/?$"];
     std::thread msgThread([&,this]() {
+        if(system("xdg-open http://localhost:8080/")) {
+            LOG(moba::common::LogLevel::WARNING) << "unable to launch webpage" << std::endl;
+        }
         while(true) {
             try {
                 endpoint->connect();
-                endpoint->sendMsg(SystemGetHardwareState{});
-                endpoint->sendMsg(TimerGetColorTheme{});
-                endpoint->sendMsg(EnvGetEnvironment{});
                 while(true) {
                     std::promise<void> promise;
                     auto data = endpoint->waitForNewMsgAsString();
@@ -72,10 +73,25 @@ void WebServer::run() {
                 }
                 exit(EXIT_SUCCESS);
             } catch(std::exception &e) {
+                EXC_LOG("std::exception", e.what());
                 std::this_thread::sleep_for(std::chrono::seconds(4));
             }
         }
     });
+
+    wsEndpoint.on_open = [&](std::shared_ptr<WsServer::Connection> connection) {
+        /*
+        auto out_message = make_shared<WsServer::OutMessage>();
+
+        out_message->write(image_buffer.data(), image_buffer.size());
+
+        connections_receiving.emplace(connection);
+        connection->send(out_message, [&connections_receiving, connection](const boost::system::error_code &ec) {
+          connections_receiving.erase(connection);
+        }, 130);
+         */
+    };
+
     wsEndpoint.on_message = [this](std::shared_ptr<WsServer::Connection> connection, std::shared_ptr<WsServer::InMessage> in) {
         auto out = in->string();
 
@@ -89,11 +105,24 @@ void WebServer::run() {
             return;
         }
 
-        endpoint->sendMsg(
-            std::stoi(out.substr(0, pos)),
-            std::stoi(out.substr(pos + 1, pos1 - pos - 1)),
-            out.substr(pos1 + 1)
-        );
+        try {
+            endpoint->sendMsg(
+                std::stoi(out.substr(0, pos)),
+                std::stoi(out.substr(pos + 1, pos1 - pos - 1)),
+                (pos1+1>out.length())?"null":out.substr(pos1 + 1)
+            );
+        } catch(std::exception &e) {
+            EXC_LOG("std::exception", e.what());
+        }
+    };
+
+    wsEndpoint.on_error = [&](std::shared_ptr<WsServer::Connection> connection, const boost::system::error_code &ec) {
+        LOG(moba::common::LogLevel::WARNING) << "Websocket Error: " << ec << ", error message: " << ec.message() << std::endl;
+    };
+
+
+    httpServer.on_error = [](std::shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & ec) {
+        LOG(moba::common::LogLevel::WARNING) << "Webserver Error: " << ec << ", error message: " << ec.message() << std::endl;
     };
 
     ResourceLoader loader;
@@ -110,8 +139,4 @@ void WebServer::run() {
     httpServer.start();
     io_service->run();
     msgThread.join();
-
-
-    //system("xdg-open http://localhost:8080/");
-
 }
