@@ -74,3 +74,4 @@ Makefile.in
 /src/Makefile
 /src/.libs/libMoBaCommon.so.0.0.0
 /src/.libs/libMoBaCommon.so.0
+/src/core
