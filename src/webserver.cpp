@@ -24,9 +24,9 @@
 #include "web/server_http.hpp"
 #include "web/server_ws.hpp"
 
-#include "moba/systemmessage.h"
-#include "moba/timermessage.h"
-#include "moba/environmenthandler.h"
+#include "moba/systemmessages.h"
+#include "moba/timermessages.h"
+#include "moba/environmentmessages.h"
 #include <moba-common/log.h>
 
 #include <future>
