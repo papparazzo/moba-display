@@ -25,16 +25,15 @@
 #include "moba/socket.h"
 #include "moba/endpoint.h"
 
-#include <moba-common/log.h>
 #include <moba-common/version.h>
 #include <moba-common/helper.h>
 
 #include <config.h>
 
 namespace {
-    moba::common::AppData appData = {
+    moba::AppData appData = {
         PACKAGE_NAME,
-        moba::common::Version(PACKAGE_VERSION),
+        moba::Version(PACKAGE_VERSION),
         __DATE__,
         __TIME__,
         "::1",
@@ -46,7 +45,6 @@ namespace {
 
 int main(int argc, char *argv[]) {
     printAppData(appData);
-    moba::common::setCoreFileSizeToULimit();
 
     /*
     if(geteuid() != 0) {

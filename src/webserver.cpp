@@ -27,7 +27,6 @@
 #include "moba/systemmessages.h"
 #include "moba/timermessages.h"
 #include "moba/environmentmessages.h"
-#include <moba-common/log.h>
 
 #include <future>
 
@@ -55,7 +54,7 @@ void WebServer::run() {
     auto &wsEndpoint = wsServer.endpoint["^/display/?$"];
     std::thread msgThread([&,this]() {
         if(system("xdg-open http://localhost:8080/")) {
-            LOG(moba::common::LogLevel::WARNING) << "unable to launch webpage" << std::endl;
+            std::cerr << "unable to launch webpage" << std::endl;
         }
         while(true) {
             try {
@@ -73,7 +72,7 @@ void WebServer::run() {
                 }
                 exit(EXIT_SUCCESS);
             } catch(std::exception &e) {
-                EXC_LOG("std::exception", e.what());
+                //EXC_LOG("std::exception", e.what());
                 std::this_thread::sleep_for(std::chrono::seconds(4));
             }
         }
@@ -109,20 +108,20 @@ void WebServer::run() {
             endpoint->sendMsg(
                 std::stoi(out.substr(0, pos)),
                 std::stoi(out.substr(pos + 1, pos1 - pos - 1)),
-                (pos1+1>out.length())?"null":out.substr(pos1 + 1)
+                (pos1 + 1 > out.length()) ? "null" : out.substr(pos1 + 1)
             );
         } catch(std::exception &e) {
-            EXC_LOG("std::exception", e.what());
+            //EXC_LOG("std::exception", e.what());
         }
     };
 
     wsEndpoint.on_error = [&](std::shared_ptr<WsServer::Connection> connection, const boost::system::error_code &ec) {
-        LOG(moba::common::LogLevel::WARNING) << "Websocket Error: " << ec << ", error message: " << ec.message() << std::endl;
+        std::cerr << "Websocket Error: " << ec << ", error message: " << ec.message() << std::endl;
     };
 
 
     httpServer.on_error = [](std::shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & ec) {
-        LOG(moba::common::LogLevel::WARNING) << "Webserver Error: " << ec << ", error message: " << ec.message() << std::endl;
+        std::cerr << "Webserver Error: " << ec << ", error message: " << ec.message() << std::endl;
     };
 
     ResourceLoader loader;
