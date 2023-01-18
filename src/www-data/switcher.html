@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!--
+ Project:    moba-display
+
+ Copyright (C) 2016 Stefan Paproth <pappi-@gmx.de>
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
+
+-->
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="css/bootstrap.min.css" crossorigin="anonymous">
+        <link rel="icon" href="/img/stellpult1.ico" type="image/x-icon">
+        <title>WebSocket Test</title>
+    </head>
+    <body>
+        <div class="alert alert-secondary" role="alert">
+            <strong>Status: </strong><span id="alert-notificaton"></span>
+        </div>
+
+        <form>
+            <div class="form-group">
+                <label for="locoList">Lokliste</label>
+                <select class="form-control" id="locoList">
+                    <option value="16410">Br. 290</option>
+                    <option value="16411">Br. 64</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input style="margin: .375rem .75rem; padding: 0" class="form-control" id="locoSpeed" type="range" min="0" max="1000" value="0">
+            </div>
+        </form>
+
+        <button id="direction-button" type="button" class="btn-block btn-lg btn btn-secondary">Fahrtrichtung</button>
+
+
+        <!--
+        <object data="img/test.svg" type="image/svg+xml" style="width: 100%;">
+          <! ---Fallback--- >
+          Ihr Browser kann leider kein svg darstellen!
+        </object>
+        -->
+
+
+        <!--
+        <canvas id="canvas" width="800" height="400">
+        </canvas>
+        <div id="time"></div>
+        -- >
+        <br />
+        <br />
+        <div id="data">
+            <h4>Environment</h4>
+            <table>
+                <tr>
+                    <td>Gewitter</td>
+                    <td id="thunderStorm">-</td>
+                </tr>
+                <tr>
+                    <td>Wind</td>
+                    <td id="wind">-</td>
+                </tr>
+                <tr>
+                    <td>Regen</td>
+                    <td id="rain">-</td>
+                </tr>
+                <tr>
+                    <td>Umgebungsgeräusche</td>
+                    <td id="environmentSound">-</td>
+                </tr>
+                <tr>
+                    <td>Hilfsausgang 1</td>
+                    <td id="aux01">-</td>
+                </tr>
+                <tr>
+                    <td>Hilfsausgang 2</td>
+                    <td id="aux02">-</td>
+                </tr>
+                <tr>
+                    <td>Hilfsausgang 3</td>
+                    <td id="aux03">-</td>
+                </tr>
+            </table>
+            <h4>ColorTheme</h4>
+            <table>
+                <tr>
+                    <td>BrightTime</td>
+                    <td id="brightTime">-</td>
+                </tr>
+                <tr>
+                    <td>DimTime</td>
+                    <td id="dimTime">-</td>
+                </tr>
+                <tr>
+                    <td>Condition</td>
+                    <td id="condition">-</td>
+                </tr>
+            </table>
+        </div>
+        -->
+        <div class="fixed-bottom">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <span id="status-hw" style="width: 30px;" class="badge badge-secondary">HW&nbsp;</span>
+                        <span id="status-sw" style="width: 30px;" class="badge badge-secondary">SW&nbsp;</span>
+                    </div>
+                    <div class="col-sm">
+                    </div>
+                    <div class="col-sm">
+                        <button id="emergency-button" type="button" class="btn-block btn-lg btn btn-secondary" disabled>Notaus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/jquery-3.5.1.slim.min.js" ></script>
+        <script src="js/bootstrap.bundle.min.js" ></script>
+        <script src="js/websocket.js"></script>
+    </body>
+</html>
