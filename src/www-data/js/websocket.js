@@ -26,26 +26,103 @@ function handleSystemMessages(msgId, data) {
         case 5:
             switch(data) {
                 case 'MANUEL':
+                    $('#status-hw').removeClass().addClass('badge badge-success');
+                    $('#status-sw').removeClass().addClass('badge badge-warning');
+                    $('#alert-notificaton').html('manuell');
                     $('#emergency-button')
                         .addClass('btn-danger')
-                        .removeClass('btn-success')
+                        .removeClass('btn-success btn-secondary')
                         .html('Notaus')
-                        .data('msg', '7#2#true');
+                        .data('msg', '7#2#true')
+                        .prop("disabled", false);
                     break;
 
                 case 'EMERGENCY_STOP':
+                    $('#status-hw').removeClass().addClass('badge badge-danger');
+                    $('#status-sw').removeClass().addClass('badge badge-warning');
+                    $('#alert-notificaton').html('Notaus');
                     $('#emergency-button')
                         .addClass('btn-success')
-                        .removeClass('btn-danger')
+                        .removeClass('btn-danger btn-secondary')
                         .html('Freigabe')
-                        .data('msg', '7#2#false');
+                        .data('msg', '7#2#false')
+                        .prop("disabled", false);
                     break;
 
+                case 'ERROR':
+                    $('#status-hw').removeClass().addClass('badge badge-danger');
+                    $('#status-sw').removeClass().addClass('badge badge-danger');
+                    $('#alert-notificaton').html('Fehler');
+                    $('#emergency-button')
+                        .addClass('btn-secondary')
+                        .removeClass('btn-danger btn-success')
+                        .prop("disabled", false);
+                    break;
 
-                    //<button id="emergency-button" type="button" class="btn-block btn-lg btn btn-danger">Notaus</button>
-                    //<button id="emergency-button" type="button" class="btn-block btn-lg btn btn-danger">Notaus</button>
+                case 'STANDBY':
+                    $('#status-hw').removeClass().addClass('badge badge-warning');
+                    $('#status-sw').removeClass().addClass('badge badge-warning');
+                    $('#alert-notificaton').html('Standby');
+                    $('#emergency-button')
+                        .addClass('btn-secondary')
+                        .removeClass('btn-danger btn-success')
+                        .prop("disabled", false);
+                    break;
 
+                case 'AUTOMATIC':
+                    $('#status-hw').removeClass().addClass('badge badge-success');
+                    $('#status-sw').removeClass().addClass('badge badge-success');
+                    $('#alert-notificaton').html('Automatic');
+                    $('#emergency-button')
+                        .addClass('btn-danger')
+                        .removeClass('btn-success btn-secondary')
+                        .html('Notaus')
+                        .data('msg', '7#2#true')
+                        .prop("disabled", false);
+                    break;
             }
+            break;
+    }
+}
+
+function handleControlMessages(msgId, data) {
+    switch(msgId) {
+        case 4:
+            for (let item of data) {
+              //  controlSwitch(item.id, item.switchStand);
+            }
+            break;
+
+        case 5:
+            for (let item of data) {
+                console.debug("--->", item);
+            }
+            break;
+    }
+}
+
+function controlSwitch(id, position) {
+    let svg = $("object")[0].contentDocument.documentElement;
+    $(svg).find("#switch_" + id + " > .bend1").hide();
+    $(svg).find("#switch_" + id + " > .straight1").hide();
+    $(svg).find("#switch_" + id + " > .bend2").hide();
+    $(svg).find("#switch_" + id + " > .straight2").hide();
+
+    switch(position) {
+        case "STRAIGHT_1":
+            $(svg).find("#switch_" + id + " > .straight1").show();
+            break;
+
+        case "BEND_1":
+            $(svg).find("#switch_" + id + " > .bend1").show();
+            break;
+
+        case "STRAIGHT_2":
+            $(svg).find("#switch_" + id + " > .straight2").show();
+            break;
+
+        case "BEND_2":
+            $(svg).find("#switch_" + id + " > .bend2").show();
             break;
     }
 }
@@ -56,17 +133,31 @@ $(document).ready(function() {
         console.debug("WebSocket message received:", event.data);
         var d = JSON.parse(event.data);
         switch(d.groupId) {
-            case 7: // SYSTEM
+            case 7:  // SYSTEM
                 handleSystemMessages(d.messageId, d.data);
+                break;
+
+            case 10: // CONTROL
+                handleControlMessages(d.messageId, d.data);
                 break;
         }
     };
     ws.onopen = function(event) {
-        ws.send('7#4#');
+        ws.send('7#4#null');  // GET_HARDWARE_STATE
+        ws.send('10#3#null'); // GET_SWITCH_STAND_LIST_REQ
+        ws.send('10#5#null'); // GET_TRAIN_LIST_REQ
     };
 
     $('#emergency-button').click(function(){
         ws.send($(this).data('msg'));
+    });
+
+    $('#direction-button').click(function(){
+        ws.send('6#5#{"localId":' + $('#locoList').val() + ',"direction":"TOGGLE"}');
+    });
+
+    $('#locoSpeed').change(function(){
+        ws.send('6#4#{"localId":' + $('#locoList').val() + ',"speed":' + $('#locoSpeed').val() + '}');
     });
 
 

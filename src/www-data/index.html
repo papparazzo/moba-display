@@ -18,28 +18,46 @@
  along with this program. If not, see <http://www.gnu.org/licenses/agpl.txt>.
 
 -->
-<html>
+<html lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="css/bootstrap.min.css" crossorigin="anonymous">
+        <link rel="icon" href="/img/stellpult1.ico" type="image/x-icon">
         <title>WebSocket Test</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
-        <script type="text/javascript" src="js/main.js"></script>
-        <!--script type="text/javascript" src="js/clock.js"></script -->
-        <script type="text/javascript" src="js/websocket.js"></script>
-
-        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-
     </head>
     <body>
-        <div id="reload-counter">Nächster reload in x Sekunde(n)</div>
-        <button id="emergencystop" style="width: 100%; height: 75px;">Anhalten</button>
+        <div class="alert alert-secondary" role="alert">
+            <strong>Status: </strong><span id="alert-notificaton"></span>
+        </div>
+
+        <form>
+            <div class="form-group">
+                <label for="locoList">Lokliste</label>
+                <select class="form-control" id="locoList">
+                    <option value="16410">Br. 290</option>
+                    <option value="16411">Br. 64</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input style="margin: .375rem .75rem; padding: 0" class="form-control" id="locoSpeed" type="range" min="0" max="1000" value="0">
+            </div>
+        </form>
+
+        <button id="direction-button" type="button" class="btn-block btn-lg btn btn-secondary">Fahrtrichtung</button>
+        <object data="img/test.svg" type="image/svg+xml" style="width: 100%;">
+          <!---Fallback--->
+          Ihr Browser kann leider kein svg darstellen!
+        </object>
+
+
+
         <!--
         <canvas id="canvas" width="800" height="400">
         </canvas>
         <div id="time"></div>
-        -->
+        -- >
         <br />
         <br />
         <div id="data">
@@ -90,5 +108,24 @@
                 </tr>
             </table>
         </div>
+        -->
+        <div class="fixed-bottom">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm">
+                        <span id="status-hw" style="width: 30px;" class="badge badge-secondary">HW&nbsp;</span>
+                        <span id="status-sw" style="width: 30px;" class="badge badge-secondary">SW&nbsp;</span>
+                    </div>
+                    <div class="col-sm">
+                    </div>
+                    <div class="col-sm">
+                        <button id="emergency-button" type="button" class="btn-block btn-lg btn btn-secondary" disabled>Notaus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/jquery-3.5.1.slim.min.js" ></script>
+        <script src="js/bootstrap.bundle.min.js" ></script>
+        <script src="js/websocket.js"></script>
     </body>
 </html>
