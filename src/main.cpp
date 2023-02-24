@@ -66,7 +66,12 @@ int main(int argc, char *argv[]) {
 */
 
     auto socket = std::make_shared<Socket>(appData.host, appData.port);
-    auto endpoint = EndpointPtr{new Endpoint{socket, appData.appName, appData.version, {Message::INTERFACE, Message::TIMER, Message::ENVIRONMENT, Message::SYSTEM}}};
+    auto endpoint = EndpointPtr{new Endpoint{
+        socket,
+        appData.appName,
+        appData.version,
+        {Message::INTERFACE, Message::TIMER, Message::ENVIRONMENT, Message::SYSTEM, Message::CONTROL}
+    }};
 
     WebServer webserver(endpoint);
     webserver.run();

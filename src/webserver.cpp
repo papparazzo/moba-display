@@ -62,8 +62,9 @@ void WebServer::run() {
                 while(true) {
                     std::promise<void> promise;
                     auto data = endpoint->waitForNewMsgAsString();
+                    std::cerr << "data: " << data << std::endl;
                     io_service->post([&] {
-                        for(auto &a_connection : wsEndpoint.get_connections()) {
+                        for(auto &a_connection: wsEndpoint.get_connections()) {
                             a_connection->send(data);
                         }
                         promise.set_value();
@@ -72,7 +73,7 @@ void WebServer::run() {
                 }
                 exit(EXIT_SUCCESS);
             } catch(std::exception &e) {
-                //EXC_LOG("std::exception", e.what());
+                std::cerr << "std::exception: " << e.what() << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(4));
             }
         }
@@ -111,7 +112,7 @@ void WebServer::run() {
                 (pos1 + 1 > out.length()) ? "null" : out.substr(pos1 + 1)
             );
         } catch(std::exception &e) {
-            //EXC_LOG("std::exception", e.what());
+            std::cerr << "std::exception: " << e.what() << std::endl;
         }
     };
 
