@@ -21,6 +21,8 @@
 hour = 10;
 minute = 20;
 
+let trains = [];
+
 function handleSystemMessages(msgId, data) {
     switch(msgId) {
         case 5:
@@ -87,16 +89,32 @@ function handleSystemMessages(msgId, data) {
 
 function handleControlMessages(msgId, data) {
     switch(msgId) {
+        case 2:
+            for (let item of data) {
+                console.debug("--->", item);
+                if(item.trainId) {
+                    setTrain(item.id, item.trainId);
+                }
+            }
+
         case 4:
             for (let item of data) {
-              //  controlSwitch(item.id, item.switchStand);
+                console.debug("--->", item);
+                controlSwitch(item.id, item.switchStand);
             }
             break;
 
-        case 5:
+        case 6:
             for (let item of data) {
-                console.debug("--->", item);
+                trains[item.id] = item;
             }
+            break;
+
+        case 12:
+            console.debug("--->", data);
+            let svg = $("object")[0].contentDocument.documentElement;
+            setTrain(data.toBlock, data.trainId);
+            $(svg).find('#b' + data.fromBlock + " > tspan").text("");
             break;
     }
 }
@@ -127,6 +145,21 @@ function controlSwitch(id, position) {
     }
 }
 
+function setTrain(blockId, trainId) {
+    let svg = $("object")[0].contentDocument.documentElement;
+
+    let train = trains[trainId];
+
+    console.log(train);
+    console.log(blockId);
+
+    if(train.direction === "FORWARD") {
+        $(svg).find('#b' + blockId + " > tspan").text(train.address + " >>");
+    } else {
+        $(svg).find('#b' + blockId + " > tspan").text(train.address + " <<");
+    }
+}
+
 $(document).ready(function() {
     var ws = new WebSocket("ws://192.168.178.34:8080/display");
     ws.onmessage = function(event) {
@@ -143,9 +176,10 @@ $(document).ready(function() {
         }
     };
     ws.onopen = function(event) {
-        ws.send('7#4#null');  // GET_HARDWARE_STATE
-        ws.send('10#3#null'); // GET_SWITCH_STAND_LIST_REQ
         ws.send('10#5#null'); // GET_TRAIN_LIST_REQ
+        ws.send('7#4#null');  // GET_HARDWARE_STATE
+        ws.send('10#1#null'); // GET_BLOCK_LIST_REQ
+        ws.send('10#3#null'); // GET_SWITCH_STAND_LIST_REQ
     };
 
     $('#emergency-button').click(function(){
