@@ -176,10 +176,10 @@ $(document).ready(function() {
         }
     };
     ws.onopen = function(event) {
+        ws.send('7#7#null');  // GET_HARDWARE_STATE
         ws.send('10#5#null'); // GET_TRAIN_LIST_REQ
-        ws.send('7#4#null');  // GET_HARDWARE_STATE
         ws.send('10#1#null'); // GET_BLOCK_LIST_REQ
-        ws.send('10#3#null'); // GET_SWITCH_STAND_LIST_REQ
+        ws.send('10#4#null'); // GET_SWITCH_STAND_LIST_REQ
     };
 
     $('#emergency-button').click(function(){
