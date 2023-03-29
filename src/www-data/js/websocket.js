@@ -97,16 +97,16 @@ function handleControlMessages(msgId, data) {
                 }
             }
 
-        case 4:
+        case 5:
             for (let item of data) {
                 console.debug("--->", item);
                 controlSwitch(item.id, item.switchStand);
             }
             break;
 
-        case 6:
+        case 8:
             for (let item of data) {
-                trains[item.id] = item;
+                trains[item.id] = item;cd 
             }
             break;
 
@@ -177,7 +177,7 @@ $(document).ready(function() {
     };
     ws.onopen = function(event) {
         ws.send('7#7#null');  // GET_HARDWARE_STATE
-        ws.send('10#5#null'); // GET_TRAIN_LIST_REQ
+        ws.send('10#7#null'); // GET_TRAIN_LIST_REQ
         ws.send('10#1#null'); // GET_BLOCK_LIST_REQ
         ws.send('10#4#null'); // GET_SWITCH_STAND_LIST_REQ
     };
